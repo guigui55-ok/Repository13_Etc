@@ -1,0 +1,86 @@
+はい、**AutoIt スクリプト内でスクリーンショットを撮ることは可能**です！
+以下の方法で、指定ウィンドウまたは画面全体のスクリーンショットを `.bmp` や `.png` ファイルとして保存できます。
+
+---
+
+## ✅ 代表的なスクリーンショット取得方法
+
+### ✔ 方法①：画面全体のスクリーンショットを保存（簡易版）
+
+```autoit
+; ファイル名に日時を付けて保存
+Local $timestamp = @YEAR & @MON & @MDAY & "_" & @HOUR & @MIN & @SEC
+Local $file = @ScriptDir & "\Screenshot_" & $timestamp & ".bmp"
+
+_ScreenCapture_Capture($file)
+```
+
+🔸 これは **画面全体**をキャプチャします。
+
+---
+
+## 🔧 スクリプトを使うには：`ScreenCapture UDF` をインクルード
+
+AutoIt の標準ライブラリ `ScreenCapture.au3` を使います。
+
+```autoit
+#include <ScreenCapture.au3>
+```
+
+---
+
+## 📌 例：ログと一緒にスクリーンショットも撮るスクリプト断片
+
+```autoit
+#include <ScreenCapture.au3>
+
+; ログファイル開始
+Local $timestamp = @YEAR & @MON & @MDAY & "_" & @HOUR & @MIN & @SEC
+Local $logFile = FileOpen(@ScriptDir & "\Log_" & $timestamp & ".log", 2)
+Func LogWrite($msg)
+    FileWriteLine($logFile, "[" & @HOUR & ":" & @MIN & ":" & @SEC & "] " & $msg)
+EndFunc
+
+; スクリーンショット取得
+Local $screenshotFile = @ScriptDir & "\Screenshot_" & $timestamp & ".bmp"
+LogWrite("スクリーンショット保存: " & $screenshotFile)
+_ScreenCapture_Capture($screenshotFile)
+```
+
+---
+
+## ✔ 方法②：特定のウィンドウだけキャプチャ（例：`UiTestTryApp`）
+
+```autoit
+; ウィンドウハンドルを取得してキャプチャ
+Local $hWnd = WinGetHandle("UiTestTryApp")
+Local $targetFile = @ScriptDir & "\WindowShot_" & @HOUR & @MIN & @SEC & ".bmp"
+_ScreenCapture_CaptureWnd($targetFile, $hWnd)
+```
+
+---
+
+## 🔽 出力形式の注意
+
+* AutoIt の `_ScreenCapture_Capture()` は **BMP形式のみ**対応です
+* PNG形式が必要な場合は **外部DLLやツールとの連携が必要**になります（必要あれば案内します）
+
+---
+
+## ✅ 補足：`ScreenCapture.au3` がない場合の対処
+
+通常 AutoIt を標準インストールしていれば以下のパスにあります：
+
+```
+C:\Program Files (x86)\AutoIt3\Include\ScreenCapture.au3
+```
+
+---
+
+## 🎁 必要に応じて…
+
+* 複数枚連続撮影
+* キャプチャ対象の自動切替
+* ファイル保存先やフォーマットの変更
+
+などの応用パターンも対応可能です。ご希望あればカスタマイズをご案内します！

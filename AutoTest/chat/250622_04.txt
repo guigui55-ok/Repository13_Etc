@@ -1,0 +1,87 @@
+はい、ご報告ありがとうございます！
+`ControlClick` や `ControlSetText` がうまく動作していないように見える場合、**ログや確認手段**を使うことで原因を特定しやすくなります。
+
+---
+
+## ✅ AutoIt でスクリプトの動作確認・ログ取得方法
+
+---
+
+### 🔍 方法①：`AutoItInfo` ツールでコントロール情報の確認
+
+1. **AutoIt Window Info Tool（AutoIt3 Window Info）** を起動
+2. 操作したい **ボタン**や**テキストボックス**の上にマウスカーソルを置く
+3. `Control` タブ内の以下の情報を確認：
+
+   * `ClassNameNN`（例: `WindowsForms10.BUTTON.app.0.141b42a_r9_ad1`）
+   * `Instance` が複数ある場合、識別が正しいか確認
+4. 実際の `ControlClick` / `ControlSetText` の識別子が **一致しているかチェック**
+
+💡**重要：** `ClassNameNN` が動的に変わるアプリ（VisualStyles使用など）では、毎回同じ `CLASS` にならないことがあります。`[NAME:xxx]` などの属性がある場合はそれを使った方が安定します。
+
+---
+
+### 🔍 方法②：スクリプトに `ConsoleWrite` でログ出力を追加
+
+AutoIt の `ConsoleWrite()` 関数を使ってログ出力できます。
+
+```autoit
+ConsoleWrite("アプリ起動開始..." & @CRLF)
+Run("C:\...\UiTestTryApp.exe")
+
+If WinWaitActive("UiTestTryApp", "", 5) Then
+    ConsoleWrite("ウィンドウが表示されました。" & @CRLF)
+Else
+    ConsoleWrite("ウィンドウが見つかりません。" & @CRLF)
+EndIf
+
+ConsoleWrite("ボタンをクリックします..." & @CRLF)
+Local $ret1 = ControlClick("UiTestTryApp", "", "[CLASS:WindowsForms10.BUTTON.app.0.141b42a_r9_ad1; INSTANCE:1]")
+ConsoleWrite("ボタンクリック結果: " & $ret1 & @CRLF)
+
+ConsoleWrite("テキストを入力します..." & @CRLF)
+Local $ret2 = ControlSetText("UiTestTryApp", "", "[CLASS:WindowsForms10.EDIT.app.0.141b42a_r9_ad1; INSTANCE:1]", "テスト入力")
+ConsoleWrite("テキスト入力結果: " & $ret2 & @CRLF)
+```
+
+📝 `ConsoleWrite()` の出力を見るには、**SciTE エディタ**で `F5` 実行するのが一番簡単です。
+下部ペインに出力されます。
+
+---
+
+### 🔍 方法③：ウィンドウタイトル一覧やコントロール情報を取得して確認
+
+```autoit
+; すべてのウィンドウタイトルを出力
+Local $list = WinList()
+For $i = 1 To $list[0][0]
+    ConsoleWrite("[" & $i & "] " & $list[$i][0] & @CRLF)
+Next
+```
+
+```autoit
+; ウィンドウ内のすべてのコントロールを列挙（AutoIt単体では困難。代替ツールあり）
+; → おすすめは "AutoIt Window Info Tool" で手動確認
+```
+
+---
+
+## 🔧 補足：うまく動作しない主な原因
+
+| 原因                   | 説明                        | 対応策                                    |
+| -------------------- | ------------------------- | -------------------------------------- |
+| CLASS名が毎回変化する        | Visual Styles で毎回異なるIDが付く | `[TEXT:ボタン名]` や `[NAME:...]` を検討       |
+| ウィンドウがまだ表示されていない     | `WinWaitActive` に失敗       | 待機時間を増やす／ウィンドウ存在確認                     |
+| テキスト入力前にフォーカスが合っていない | 入力できていない                  | `ControlFocus` を使ってから `ControlSetText` |
+
+---
+
+## ✅ 解決のために次にできること
+
+* 上記の `ConsoleWrite()` を挿入して SciTE で実行してみてください
+* 失敗時の出力から、どこで止まっているか明確になります
+* `AutoIt Info Tool` でクリック対象のコントロール情報を再確認
+
+---
+
+ご希望であれば、WinFormsアプリのウィンドウキャプチャやコントロール名に応じた具体的なスクリプト修正案もご提示できます。お気軽にお知らせください。

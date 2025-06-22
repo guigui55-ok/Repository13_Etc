@@ -1,0 +1,65 @@
+ご指摘の通り、**SciTE エディタの出力で日本語が文字化け**するのは、**出力コンソールのエンコーディングが ANSI（SJIS）固定**であり、AutoIt スクリプトが UTF-8 で保存されていることによるものです。
+
+---
+
+## ✅ 解決方法
+
+### ✔ 方法①：**スクリプトファイルの文字コードを ANSI に変更する（おすすめ）**
+
+#### ⬇ 手順（SciTEを使う場合）
+
+1. SciTE で `.au3` ファイルを開く
+2. メニューから
+   　`File` → `Encoding` → `Code Page Property (usually ANSI)` を選択
+3. 上書き保存（`Ctrl + S`）
+4. `F5` で再実行 → 日本語が正しく表示されるはずです
+
+---
+
+### ✔ 方法②：`ConsoleWrite` の文字列を英語に変えて確認（回避策）
+
+```autoit
+ConsoleWrite("Window detected." & @CRLF)
+ConsoleWrite("Clicking button..." & @CRLF)
+ConsoleWrite("Text input..." & @CRLF)
+```
+
+✅ これなら UTF-8 のままでも文字化けしません。
+
+---
+
+### ✔ 方法③：標準出力をファイルに書き出して確認（ログファイル出力）
+
+```autoit
+Local $logFile = FileOpen(@ScriptDir & "\test_log.txt", 2) ; 2 = 書き込みモード
+FileWriteLine($logFile, "Window check start...")
+
+If WinWaitActive("UiTestTryApp", "", 5) Then
+    FileWriteLine($logFile, "Window is active")
+Else
+    FileWriteLine($logFile, "Window not found")
+EndIf
+
+FileWriteLine($logFile, "Trying button click...")
+Local $ret1 = ControlClick("UiTestTryApp", "", "[CLASS:WindowsForms10.BUTTON.app.0.141b42a_r9_ad1; INSTANCE:1]")
+FileWriteLine($logFile, "Click result: " & $ret1)
+
+FileWriteLine($logFile, "Trying text input...")
+Local $ret2 = ControlSetText("UiTestTryApp", "", "[CLASS:WindowsForms10.EDIT.app.0.141b42a_r9_ad1; INSTANCE:1]", "テスト入力")
+FileWriteLine($logFile, "Text result: " & $ret2)
+
+FileClose($logFile)
+```
+
+📄 この方法なら、文字化けせずに `test_log.txt` にログ出力できます。
+
+---
+
+## ✅ おすすめ：まずは「ANSIで保存」で確認
+
+SciTE による日本語ログ確認の最も簡単な方法は、**スクリプトを ANSI に変換して保存**することです。
+それでもうまくいかない場合は、**ログファイル出力**を併用するのが確実です。
+
+---
+
+ご希望があれば、SciTEの出力やログ結果を見て**スクリプトの修正点**や**識別子の再確認方法**を具体的にお手伝いできます。お気軽にどうぞ。

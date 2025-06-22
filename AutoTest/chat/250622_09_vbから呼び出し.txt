@@ -1,0 +1,81 @@
+はい、AutoIt スクリプトを **VB.NETから実行するテンプレート** を以下にご用意しました。
+AutoIt スクリプト（`.au3` または `.exe`）を VB.NET から呼び出し、必要に応じてログや結果ファイルを確認できます。
+
+---
+
+## ✅ 前提
+
+* AutoIt スクリプトを `.au3` のまま実行 → `AutoIt3.exe` が必要
+* `.exe` にコンパイル済みなら `Process.Start()` で直接実行可
+
+---
+
+## 📄 ① AutoIt スクリプトを `.au3` のまま実行する場合（テンプレート）
+
+```vbnet
+Imports System.Diagnostics
+
+Public Class AutoItRunner
+
+    ''' <summary>
+    ''' AutoItスクリプト（.au3）を実行する
+    ''' </summary>
+    ''' <param name="scriptPath">AutoItのスクリプトファイル（.au3）のパス</param>
+    Public Shared Sub RunAutoItScript(scriptPath As String)
+        Dim autoItPath As String = "C:\Program Files (x86)\AutoIt3\AutoIt3.exe"
+
+        If Not IO.File.Exists(scriptPath) Then
+            MessageBox.Show("スクリプトが存在しません: " & scriptPath)
+            Return
+        End If
+
+        Dim proc As New Process()
+        proc.StartInfo.FileName = autoItPath
+        proc.StartInfo.Arguments = Chr(34) & scriptPath & Chr(34) ' パスにスペースがある場合に対応
+        proc.StartInfo.UseShellExecute = False
+        proc.StartInfo.CreateNoWindow = True
+        proc.Start()
+    End Sub
+
+End Class
+```
+
+### ✅ 使用例（ボタンクリックなどから呼び出し）
+
+```vbnet
+Private Sub Button_RunTest_Click(sender As Object, e As EventArgs) Handles Button_RunTest.Click
+    Dim scriptPath As String = "C:\TestScripts\Sample1_WinFormsApp.au3"
+    AutoItRunner.RunAutoItScript(scriptPath)
+End Sub
+```
+
+---
+
+## 🧱 ② AutoIt を `.exe` にコンパイルしてから実行する場合（もっと簡単）
+
+AutoIt スクリプトを `SciTE` メニュー →「Tools」→「Compile Script」から `.exe` にすると、直接実行できます。
+
+```vbnet
+Dim exePath As String = "C:\TestScripts\Sample1_WinFormsApp.exe"
+Process.Start(exePath)
+```
+
+---
+
+## 📝 補足・オプション
+
+| 機能        | 方法                                                    |
+| --------- | ----------------------------------------------------- |
+| 実行後にログを読む | `Process.WaitForExit()` で待機 → ログファイル読み込み              |
+| エラー確認     | `.au3` 内でログ出力 or メッセージボックス                            |
+| 引数渡し      | `AutoIt3.exe script.au3 "arg1" "arg2"` の形式で渡せます（対応必要） |
+
+---
+
+## 🎁 応用テンプレートが必要なら…
+
+* ログファイルのパスを引数で渡す
+* AutoIt 側から VB.NET に結果通知（ファイル、ExitCodeなど）
+* テスト状況のリアルタイム表示
+
+なども可能ですので、ご希望あればさらに拡張可能です！お気軽にどうぞ。

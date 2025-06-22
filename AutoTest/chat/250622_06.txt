@@ -1,0 +1,87 @@
+了解しました！
+`ConsoleWrite` を `FileWriteLine` に切り替え、ログファイル名を「`Log_yyyyMMdd_HHmmss.log`」形式で作成するようにしたテンプレートを以下にご用意しました。
+
+---
+
+## ✅ AutoIt スクリプト：ログファイル出力対応版
+
+```autoit
+; =============================
+; WinForms アプリ 自動操作 + ログ出力
+; =============================
+
+; ログファイル名の生成：Log_yyyyMMdd_HHmmss.log
+Local $now = @YEAR & @MON & @MDAY & "_" & @HOUR & @MIN & @SEC
+Local $logFileName = "Log_" & $now & ".log"
+Local $logFilePath = @ScriptDir & "\" & $logFileName
+
+; ログファイルを開く（2 = 書き込み、上書き）
+Local $logFile = FileOpen($logFilePath, 2)
+If $logFile = -1 Then
+    MsgBox(16, "エラー", "ログファイルを開けません: " & $logFilePath)
+    Exit
+EndIf
+
+; ログ書き込み関数
+Func LogWrite($msg)
+    FileWriteLine($logFile, "[" & @HOUR & ":" & @MIN & ":" & @SEC & "] " & $msg)
+EndFunc
+
+; アプリ起動
+LogWrite("アプリ起動開始")
+Run("C:\Users\OK\source\repos\Repository10_VBnet\UiTestTryApp\UiTestTryApp\bin\Debug\UiTestTryApp.exe")
+
+; ウィンドウが表示されるまで待機
+If WinWaitActive("UiTestTryApp", "", 5) Then
+    LogWrite("ウィンドウを検出しました")
+Else
+    LogWrite("ウィンドウが見つかりません（5秒タイムアウト）")
+    FileClose($logFile)
+    Exit
+EndIf
+
+; ボタンクリック
+LogWrite("ボタンをクリックします")
+Local $ret1 = ControlClick("UiTestTryApp", "", "[CLASS:WindowsForms10.BUTTON.app.0.141b42a_r9_ad1; INSTANCE:1]")
+LogWrite("ControlClick結果: " & $ret1)
+
+; テキスト入力
+LogWrite("テキストを入力します")
+Local $ret2 = ControlSetText("UiTestTryApp", "", "[CLASS:WindowsForms10.EDIT.app.0.141b42a_r9_ad1; INSTANCE:1]", "テスト入力")
+LogWrite("ControlSetText結果: " & $ret2)
+
+; Enterキー送信
+LogWrite("Enterキーを送信")
+Send("{ENTER}")
+
+; ログファイルを閉じる
+LogWrite("処理完了")
+FileClose($logFile)
+```
+
+---
+
+## 📄 出力されるログ例（`Log_20250622_183045.log`）
+
+```
+[18:30:45] アプリ起動開始
+[18:30:45] ウィンドウを検出しました
+[18:30:45] ボタンをクリックします
+[18:30:45] ControlClick結果: 1
+[18:30:45] テキストを入力します
+[18:30:45] ControlSetText結果: 1
+[18:30:45] Enterキーを送信
+[18:30:45] 処理完了
+```
+
+---
+
+## 📝 備考
+
+* ログファイルはスクリプトの `.au3` と**同じフォルダ**に作成されます
+* 時刻はすべて `@HOUR:@MIN:@SEC` で出力
+* 日付付きファイル名により、**毎回別ファイル**が作成されます
+
+---
+
+必要に応じて、ログ保存先を変更したり、ファイル追記（モード=1）にもできますので、カスタマイズ希望があればお知らせください。

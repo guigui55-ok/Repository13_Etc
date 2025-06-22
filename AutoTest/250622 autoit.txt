@@ -1,0 +1,10 @@
+AutoItスクリプトのテンプレート（WinFormsやJavaアプリ用）
+
+VB.NETからの呼び出しテンプレート
+
+テストフロー全体のテンプレート（ログ取得・結果判定含む）
+
+
+
+「Au3Info」ウィンドウ情報ツールの場所、使い方
+https://autoit.windows-waza.com/au3info-window-information-tool-location-usage-sample-code/

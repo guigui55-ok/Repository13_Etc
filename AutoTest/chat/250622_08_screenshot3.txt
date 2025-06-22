@@ -1,0 +1,91 @@
+承知しました！
+以下に、AutoIt を使った **ウィンドウ単位の PNG キャプチャ**と、**領域指定の PNG キャプチャ**の例をまとめてご提供します。
+
+---
+
+## ✅ 共通準備：必要な `#include` と GDI+ 初期化処理
+
+```autoit
+#include <ScreenCapture.au3>
+#include <GDIPlus.au3>
+```
+
+---
+
+## 📌 ① ウィンドウ単位の PNG キャプチャ
+
+```autoit
+; === 対象ウィンドウタイトル ===
+Local $windowTitle = "UiTestTryApp"
+
+; === タイムスタンプ付きファイル名 ===
+Local $timestamp = @YEAR & @MON & @MDAY & "_" & @HOUR & @MIN & @SEC
+Local $bmpPath = @ScriptDir & "\WindowCapture_" & $timestamp & ".bmp"
+Local $pngPath = @ScriptDir & "\WindowCapture_" & $timestamp & ".png"
+
+; === ウィンドウハンドル取得 ===
+Local $hWnd = WinGetHandle($windowTitle)
+
+; === BMPでウィンドウキャプチャ ===
+_ScreenCapture_CaptureWnd($bmpPath, $hWnd)
+
+; === BMP → PNG に変換 ===
+_GDIPlus_Startup()
+Local $hImage = _GDIPlus_ImageLoadFromFile($bmpPath)
+_GDIPlus_ImageSaveToFile($hImage, $pngPath)
+_GDIPlus_ImageDispose($hImage)
+_GDIPlus_Shutdown()
+
+; === 中間BMP削除（不要なら） ===
+FileDelete($bmpPath)
+```
+
+---
+
+## 📌 ② 領域指定（座標指定）の PNG キャプチャ
+
+```autoit
+; === タイムスタンプ付きファイル名 ===
+Local $timestamp = @YEAR & @MON & @MDAY & "_" & @HOUR & @MIN & @SEC
+Local $bmpPath = @ScriptDir & "\RegionCapture_" & $timestamp & ".bmp"
+Local $pngPath = @ScriptDir & "\RegionCapture_" & $timestamp & ".png"
+
+; === キャプチャ範囲（左上X, 左上Y, 幅, 高さ）===
+Local $x = 100
+Local $y = 150
+Local $width = 300
+Local $height = 200
+
+; === BMPで範囲キャプチャ ===
+_ScreenCapture_Capture($bmpPath, $x, $y, $x + $width, $y + $height)
+
+; === BMP → PNG に変換 ===
+_GDIPlus_Startup()
+Local $hImage = _GDIPlus_ImageLoadFromFile($bmpPath)
+_GDIPlus_ImageSaveToFile($hImage, $pngPath)
+_GDIPlus_ImageDispose($hImage)
+_GDIPlus_Shutdown()
+
+; === 中間BMP削除 ===
+FileDelete($bmpPath)
+```
+
+---
+
+## ✅ 補足とヒント
+
+| 項目             | 補足                                                |
+| -------------- | ------------------------------------------------- |
+| 対象ウィンドウが非表示のとき | `_ScreenCapture_CaptureWnd()` は空白画像になることがあります     |
+| 領域の座標          | `AutoIt Window Info Tool` や `MouseGetPos()` で確認可能 |
+| PNG保存先         | `@ScriptDir` = スクリプト実行場所（別パスも可）                   |
+
+---
+
+## 🎯 必要なら：
+
+* ウィンドウキャプチャ＋自動ログ名付けの統合処理
+* 実行ログとスクリーンショットをセットで保存
+* ボタン単位のスクリーンショット（領域精度アップ）
+
+などのカスタムスクリプトも作成できますので、お気軽にご相談ください！

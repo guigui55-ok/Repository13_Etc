@@ -1,0 +1,91 @@
+ログの出力を見る限り、`ControlClick` と `ControlSetText` の結果が `0` になっており、これは **操作が失敗した（対象のコントロールが見つからなかった）** ことを意味します。
+
+---
+
+## ✅ 原因の可能性と対応方法
+
+### ❌ 原因：コントロールIDが正しくない、または取得できていない
+
+* `CLASS:WindowsForms10.BUTTON.app.0.141b42a_r9_ad1` のような指定は、**VisualStylesの影響などで実行時に変わることがあります**
+* `INSTANCE` の番号も状況により変化することがあります
+* 対象コントロールが **サブウィンドウ**や **まだ表示されていない状態**の可能性もあります
+
+---
+
+## 🔧 解決方法
+
+### ✔ 方法①：`AutoIt Window Info Tool` でコントロールの正確な識別子を再確認する
+
+1. `AutoIt3\Au3Info.exe`（AutoIt Window Info Tool）を起動
+
+2. マウスを**対象のボタン**や**テキストボックス**の上に重ねる
+
+3. `Control` タブの以下の情報を確認：
+
+   * **Class**（例：`WindowsForms10.BUTTON.app.0...`）
+   * **ClassNameNN**（例：`Button1`）
+   * **Instance**（例：1）
+   * **Text**（ボタンに表示される文字列）
+
+4. できれば `ControlID` や `Text` が使える識別子を選ぶ（例：`[TEXT:OK]` など）
+
+---
+
+### ✔ 方法②：`ControlClick` の指定方法を見直す（`[TEXT:xxx]` の使用）
+
+```autoit
+; テキストラベルで指定（ボタンに "OK" と表示されている場合）
+ControlClick("UiTestTryApp", "", "[TEXT:OK]")
+
+; または、Class + Instance の組み合わせで確認
+ControlClick("UiTestTryApp", "", "[CLASS:Button; INSTANCE:1]")
+```
+
+---
+
+### ✔ 方法③：`ControlFocus` を使ってからクリックする（有効化されていない可能性）
+
+```autoit
+ControlFocus("UiTestTryApp", "", "[TEXT:OK]")
+ControlClick("UiTestTryApp", "", "[TEXT:OK]")
+```
+
+---
+
+### ✔ 方法④：フォールバックとして `MouseClick` を使う（位置が分かっている場合）
+
+```autoit
+; 相対位置を使ってマウスクリック（ボタンがこの座標にある場合）
+MouseClick("left", 200, 150)  ; 適宜座標を調整
+```
+
+---
+
+## 🧪 試してみる修正案（ログ付き）
+
+```autoit
+LogWrite("ボタンにフォーカスします")
+Local $focusResult = ControlFocus("UiTestTryApp", "", "[TEXT:OK]")
+LogWrite("ControlFocus結果: " & $focusResult)
+
+LogWrite("ボタンをクリックします")
+Local $clickResult = ControlClick("UiTestTryApp", "", "[TEXT:OK]")
+LogWrite("ControlClick結果: " & $clickResult)
+```
+
+📝 `ControlFocus` と組み合わせることで改善するケースもあります。
+
+---
+
+## 📌 補足：うまくいかないときのポイント
+
+| チェック項目                        | 方法                             |
+| ----------------------------- | ------------------------------ |
+| ボタンの正確なテキストは？                 | 実行時の画面で確認、または AutoIt Info Tool |
+| Instance は正しいか？               | 同じクラスが複数あるとズレる可能性あり            |
+| ボタンが隠れていないか？                  | 表示されるまで `Sleep` で待つのも有効        |
+| Visual Styles により Class 名が変動？ | `[TEXT:～]` の使用が安定的             |
+
+---
+
+必要であれば、`AutoIt Info Tool` を使ったスクリーンショットや、取得した `ClassNameNN` 情報をもとに、スクリプトを一緒に調整することも可能です。お気軽にお知らせください。

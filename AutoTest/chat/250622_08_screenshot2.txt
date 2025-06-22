@@ -1,0 +1,72 @@
+AutoIt 標準の `_ScreenCapture_Capture()` 関数では **BMP形式のみ対応**のため、PNG形式で保存するには以下の方法があります：
+
+---
+
+## ✅ 方法：BMPでキャプチャ → PNGに変換（GDI+ 使用）
+
+AutoIt の `GDIPlus.au3` を使えば、**BMP画像を PNG に変換して保存**できます。
+
+---
+
+### 📦 必要な `#include`
+
+```autoit
+#include <ScreenCapture.au3>
+#include <GDIPlus.au3>
+```
+
+---
+
+## ✅ BMP → PNG 変換付きのスクリーンショット保存テンプレート
+
+```autoit
+#include <ScreenCapture.au3>
+#include <GDIPlus.au3>
+
+; タイムスタンプ付きファイル名
+Local $timestamp = @YEAR & @MON & @MDAY & "_" & @HOUR & @MIN & @SEC
+Local $bmpPath = @ScriptDir & "\Screenshot_" & $timestamp & ".bmp"
+Local $pngPath = @ScriptDir & "\Screenshot_" & $timestamp & ".png"
+
+; BMPで画面キャプチャ
+_ScreenCapture_Capture($bmpPath)
+
+; BMP → PNG に変換
+_GDIPlus_Startup()
+Local $hImage = _GDIPlus_ImageLoadFromFile($bmpPath)
+_GDIPlus_ImageSaveToFile($hImage, $pngPath)
+_GDIPlus_ImageDispose($hImage)
+_GDIPlus_Shutdown()
+
+; BMPを削除（不要なら）
+FileDelete($bmpPath)
+```
+
+---
+
+## 📘 補足：上記の処理の概要
+
+| ステップ                           | 処理                           |
+| ------------------------------ | ---------------------------- |
+| `_ScreenCapture_Capture()`     | BMP形式でキャプチャ（全画面 or ウィンドウ指定可） |
+| `_GDIPlus_Startup()`           | GDI+ を初期化                    |
+| `_GDIPlus_ImageLoadFromFile()` | BMP画像を読み込む                   |
+| `_GDIPlus_ImageSaveToFile()`   | PNG形式で保存                     |
+| `FileDelete()`                 | 中間の BMP を削除（任意）              |
+
+---
+
+## 📝 PNGファイルの確認
+
+保存先はスクリプトのあるディレクトリ（`@ScriptDir`）に `Screenshot_yyyymmdd_hhmmss.png` という名前で保存されます。
+
+---
+
+## 🎯 応用オプション
+
+* 特定のウィンドウだけPNGキャプチャしたい → `_ScreenCapture_CaptureWnd()` を使う
+* PNGの保存先を変更したい → `@ScriptDir` を変更
+
+---
+
+必要であれば、**ウィンドウ単位のPNGキャプチャ**や**領域指定キャプチャ**の例もご案内できます！

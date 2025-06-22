@@ -1,0 +1,99 @@
+ありがとうございます。条件を整理した上で、**最適なテスト自動化方針**をご提案いたします。
+
+---
+
+## 🔧 テスト対象アプリの条件
+
+| 項目     | 内容                               |
+| ------ | -------------------------------- |
+| 対象アプリ1 | .NET WinForms アプリ                |
+| 対象アプリ2 | Javaベースの SECS Simulator（Swing等？） |
+| 使用言語   | **VB.NET限定**（C#不可）               |
+| 目的     | 両アプリを同時に操作し、自動テスト実行              |
+
+---
+
+## 🎯 推奨アプローチの結論
+
+### ✅ **AutoIt + VB.NETからの連携**
+
+* VB.NETから AutoIt スクリプトを制御
+* WinForms → UIAベースで制御も可能だが、AutoItの方がVB.NETで簡単に扱える
+* Javaアプリ → **UIA非対応が多いため、AutoItなどの低レベル操作や画像認識ベースが有効**
+
+---
+
+## 🧰 推奨ツール構成
+
+| ツール             | 用途              | VB.NET連携         | Javaアプリ対応           | 特徴                  |
+| --------------- | --------------- | ---------------- | ------------------- | ------------------- |
+| **AutoIt**      | GUI操作自動化        | ○（EXE呼び出し・COM連携） | ◎（座標クリックやウィンドウ制御可能） | 軽量・学習コスト低い          |
+| **Inspect.exe** | WinForms UI要素調査 | ○                | ×                   | WinFormsのボタン名など調査   |
+| **SikuliX（補助）** | 画像認識ベースの操作      | △（Java経由）        | ◎（画像認識）             | Javaアプリの非構造UIでも操作可能 |
+
+---
+
+## 🧪 AutoItでできること（Javaアプリ含む）
+
+| 操作             | 対応                             |
+| -------------- | ------------------------------ |
+| ウィンドウの表示・フォーカス | ◎ `WinActivate("タイトル")`        |
+| ボタンクリック        | ◎ `ControlClick`, `MouseClick` |
+| テキスト入力         | ◎ `ControlSend`, `Send`        |
+| ウィンドウタイトル取得・確認 | ◎                              |
+| Javaアプリの操作     | ○（座標・ショートカット・画像でも可）            |
+
+---
+
+## ✅ VB.NETとの連携方法（サンプル）
+
+### AutoItスクリプトを `.au3` で作成
+
+```autoit
+; test.au3
+Run("C:\Path\To\SECSsimulator.exe")
+WinWaitActive("SECS Simulator")
+Send("ログイン{ENTER}")
+```
+
+### VB.NETでAutoItスクリプトを実行
+
+```vb.net
+Process.Start("C:\Program Files (x86)\AutoIt3\AutoIt3.exe", "C:\Path\To\test.au3")
+```
+
+---
+
+## 🔄 応用：AutoItをVB.NETから直接操作（COM）
+
+AutoItには **COMオブジェクト化** も可能で、以下のように直接VB.NETから制御できます：
+
+```vb.net
+Dim autoIt As Object = CreateObject("AutoItX3.Control")
+autoIt.Run("C:\Path\To\WinFormsApp.exe")
+autoIt.WinWaitActive("アプリタイトル")
+autoIt.ControlClick("アプリタイトル", "", "[CLASS:Button; INSTANCE:1]")
+```
+
+---
+
+## 🎯 推奨手順まとめ
+
+1. **AutoItをインストール**（公式サイトから）
+2. **対象アプリのUI構造を調査**（WinFormsには `Inspect.exe`）
+3. **SECS Simulator の動作を観察**
+
+   * キーボード操作・ボタン位置を特定
+   * 非UIA対応であれば、AutoItの `MouseClick` や `Send` を使う
+4. **AutoItスクリプトを試作**
+5. **VB.NETからAutoItを呼び出して統合**
+
+---
+
+## 📘 必要であれば…
+
+* AutoItスクリプトのテンプレート（WinFormsやJavaアプリ用）
+* VB.NETからの呼び出しテンプレート
+* テストフロー全体のテンプレート（ログ取得・結果判定含む）
+
+も提供できます。ぜひお知らせください。

@@ -1,0 +1,20 @@
+https://qiita.com/e99h2121/items/e23f5c59a985c612ac36
+
+
+AutoItでできること
+キー操作記録
+キーボード操作 [http://www.autoitscript.com/autoit3/docs/functions/Send.htm キーの一覧]
+マウス操作
+
+
+簡単な利用方法
+AutoItMacroGeneratorを起動し、キー操作をスクリプトに変換する
+Helpの参照(かなり充実している)
+Sciteのヘルプ
+AutoIt3フォルダ以下に多くのSampleがある。 --　Examples,Extras,Include
+Au3Info.exeを利用してコンポーネント情報を調べる。例)ContolIdやWindowNameなどはこのexeを実行することで把握することが出来る
+
+
+Sample
+C:\Program Files (x86)\AutoIt3\Examples
+

@@ -1,0 +1,218 @@
+Windowsデスクトップアプリのテスト自動化
+
+
+Windows デスクトップアプリのテスト自動化には、テストの目的や対象アプリ（WinForms, WPF, MFC, UWP など）、実行環境、言語の制約によって適したアプローチやツールが異なります。以下に代表的なアプローチ・プラットフォーム・フレームワークを整理します。
+
+---
+
+## ✅ 主なアプローチ分類
+
+| アプローチ            | 説明                                 |
+| ---------------- | ---------------------------------- |
+| **UI操作の記録・再生**   | ユーザーの操作を記録し、同じ操作を再実行               |
+| **コードベースのUIテスト** | コードでUI要素を特定し、操作・検証を自動化             |
+| **画像認識ベース**      | 画面上の画像を認識して自動操作                    |
+| **低レベル自動化**      | Win32 API, UI Automation API を直接操作 |
+
+---
+
+## 🧰 代表的なツール・フレームワーク
+
+### 1. **Windows Application Driver (WinAppDriver)**
+
+* **種類**：Microsoft公式のUIテスト自動化ツール
+* **特徴**：
+
+  * Appiumベース（Seleniumと似た記法）
+  * WinForms / WPF / UWP アプリ対応
+  * C#, Java, Python 対応
+* **向いている人**：コードでしっかり自動化したい開発者
+
+🔗 [https://github.com/microsoft/WinAppDriver](https://github.com/microsoft/WinAppDriver)
+
+---
+
+### 2. **UI Automation API (UIA) / FlaUI**
+
+* **種類**：.NET用のUIAラッパーフレームワーク
+* **特徴**：
+
+  * Windowsが提供する標準UI Automation APIを利用
+  * FlaUI は .NET/C# でのテストに特化
+  * 高速・安定
+* **メリット**：
+
+  * WinAppDriverより細かい制御が可能
+
+🔗 [https://github.com/FlaUI/FlaUI](https://github.com/FlaUI/FlaUI)
+
+---
+
+### 3. **AutoIt / AutoHotkey**
+
+* **種類**：スクリプトベースの自動化ツール
+* **特徴**：
+
+  * GUI操作に強い（クリック、キーボード入力、画像認識など）
+  * アプリの構造に依存せず操作できる（非UIA対応アプリも可）
+* **向いている人**：GUI操作の再現や非対応アプリのテスト
+
+🔗 [https://www.autoitscript.com/site/](https://www.autoitscript.com/site/)
+
+---
+
+### 4. **SikuliX**
+
+* **種類**：画像認識ベースの自動化
+* **特徴**：
+
+  * 画面の画像を指定して自動操作
+  * Javaベース、Python風の記法
+* **弱点**：画面の解像度・UI変更に弱い
+
+🔗 [http://sikulix.com/](http://sikulix.com/)
+
+---
+
+### 5. **TestComplete（有償）**
+
+* **種類**：商用の強力なUI自動化ツール
+* **特徴**：
+
+  * 対応プラットフォームが非常に多い
+  * レコーディングやスクリプト両対応
+* **メリット**：初心者にも使いやすいUI、自動オブジェクト認識機能
+
+🔗 [https://smartbear.com/product/testcomplete/](https://smartbear.com/product/testcomplete/)
+
+---
+
+## 🧪 その他の補助ツール
+
+* **Inspect.exe**：Windows SDK付属。UIオートメーション要素を調査可能。
+* **AccEvent.exe**：UIイベント監視ツール
+* **UISpy（古いが一部環境で使える）**
+
+---
+
+## 🧭 おすすめ選定指針
+
+| 要件                   | 推奨ツール                         |
+| -------------------- | ----------------------------- |
+| .NETアプリをコードベースで制御したい | **FlaUI**, **WinAppDriver**   |
+| 非対応アプリや簡易操作が目的       | **AutoIt**, **AutoHotkey**    |
+| 画像で操作を再現したい          | **SikuliX**                   |
+| GUIでもっと簡単にテストを作成したい  | **TestComplete**, **Ranorex** |
+
+---
+
+ご希望があれば、対象アプリ（WinForms/WPF/UWPなど）や言語（VB.NET/C#/Pythonなど）に応じた、具体的なサンプルコードや導入手順も提供できます。ご興味のあるツールがあればお知らせください。
+
+
+
+非UIA対応アプリとは何ですか？
+非UIA対応アプリとは、Microsoftの「UI Automation API（UIA）」に正式に対応していない、あるいは対応が不十分なWindowsデスクトップアプリケーションを指します。
+
+------------
+
+ありがとうございます。条件を整理した上で、**最適なテスト自動化方針**をご提案いたします。
+
+---
+
+## 🔧 テスト対象アプリの条件
+
+| 項目     | 内容                               |
+| ------ | -------------------------------- |
+| 対象アプリ1 | .NET WinForms アプリ                |
+| 対象アプリ2 | Javaベースの SECS Simulator（Swing等？） |
+| 使用言語   | **VB.NET限定**（C#不可）               |
+| 目的     | 両アプリを同時に操作し、自動テスト実行              |
+
+---
+
+## 🎯 推奨アプローチの結論
+
+### ✅ **AutoIt + VB.NETからの連携**
+
+* VB.NETから AutoIt スクリプトを制御
+* WinForms → UIAベースで制御も可能だが、AutoItの方がVB.NETで簡単に扱える
+* Javaアプリ → **UIA非対応が多いため、AutoItなどの低レベル操作や画像認識ベースが有効**
+
+---
+
+## 🧰 推奨ツール構成
+
+| ツール             | 用途              | VB.NET連携         | Javaアプリ対応           | 特徴                  |
+| --------------- | --------------- | ---------------- | ------------------- | ------------------- |
+| **AutoIt**      | GUI操作自動化        | ○（EXE呼び出し・COM連携） | ◎（座標クリックやウィンドウ制御可能） | 軽量・学習コスト低い          |
+| **Inspect.exe** | WinForms UI要素調査 | ○                | ×                   | WinFormsのボタン名など調査   |
+| **SikuliX（補助）** | 画像認識ベースの操作      | △（Java経由）        | ◎（画像認識）             | Javaアプリの非構造UIでも操作可能 |
+
+---
+
+## 🧪 AutoItでできること（Javaアプリ含む）
+
+| 操作             | 対応                             |
+| -------------- | ------------------------------ |
+| ウィンドウの表示・フォーカス | ◎ `WinActivate("タイトル")`        |
+| ボタンクリック        | ◎ `ControlClick`, `MouseClick` |
+| テキスト入力         | ◎ `ControlSend`, `Send`        |
+| ウィンドウタイトル取得・確認 | ◎                              |
+| Javaアプリの操作     | ○（座標・ショートカット・画像でも可）            |
+
+---
+
+## ✅ VB.NETとの連携方法（サンプル）
+
+### AutoItスクリプトを `.au3` で作成
+
+```autoit
+; test.au3
+Run("C:\Path\To\SECSsimulator.exe")
+WinWaitActive("SECS Simulator")
+Send("ログイン{ENTER}")
+```
+
+### VB.NETでAutoItスクリプトを実行
+
+```vb.net
+Process.Start("C:\Program Files (x86)\AutoIt3\AutoIt3.exe", "C:\Path\To\test.au3")
+```
+
+---
+
+## 🔄 応用：AutoItをVB.NETから直接操作（COM）
+
+AutoItには **COMオブジェクト化** も可能で、以下のように直接VB.NETから制御できます：
+
+```vb.net
+Dim autoIt As Object = CreateObject("AutoItX3.Control")
+autoIt.Run("C:\Path\To\WinFormsApp.exe")
+autoIt.WinWaitActive("アプリタイトル")
+autoIt.ControlClick("アプリタイトル", "", "[CLASS:Button; INSTANCE:1]")
+```
+
+---
+
+## 🎯 推奨手順まとめ
+
+1. **AutoItをインストール**（公式サイトから）
+2. **対象アプリのUI構造を調査**（WinFormsには `Inspect.exe`）
+3. **SECS Simulator の動作を観察**
+
+   * キーボード操作・ボタン位置を特定
+   * 非UIA対応であれば、AutoItの `MouseClick` や `Send` を使う
+4. **AutoItスクリプトを試作**
+5. **VB.NETからAutoItを呼び出して統合**
+
+---
+
+## 📘 必要であれば…
+
+* AutoItスクリプトのテンプレート（WinFormsやJavaアプリ用）
+* VB.NETからの呼び出しテンプレート
+* テストフロー全体のテンプレート（ログ取得・結果判定含む）
+
+も提供できます。ぜひお知らせください。
+
+
