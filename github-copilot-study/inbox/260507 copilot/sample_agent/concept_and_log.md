@@ -48,3 +48,14 @@ memo.txt を整理して output.md に反映してください。
 
 AGENT.md に従って memo.txt を整理してください。
 結果は output.md に保存してください。
+
+# Ask/Agent実行比較
+* Askで実行
+work/memo.txt を整理して output.md の内容案を出してください。
+memo-organizer を使ってください。
+→大した変わらない
+
+
+## まとめ
+Agent.md は .github/agents フォルダを作成して、その中に `[summay].agent.md' ファイルを作成する。
+→VsCodeチャット欄の作業を選ぶ場所（Agent/askなど）に表示されるので、それを選択して質問をする。
