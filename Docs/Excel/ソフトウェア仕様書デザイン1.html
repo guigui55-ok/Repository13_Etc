@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ソフトウェア仕様書（テンプレート）</title>
+  <style>
+    :root{
+      --ink:#1f2937;          /* 本文 */
+      --muted:#6b7280;        /* 注釈 */
+      --line:#e5e7eb;         /* 罫線 */
+      --paper:#ffffff;        /* 背景 */
+      --soft:#f9fafb;         /* 薄背景 */
+      --accent:#1e3a8a;       /* アクセント（濃紺） */
+      --accent2:#0f766e;      /* サブアクセント（深緑） */
+      --warn:#b45309;         /* 注意 */
+      --danger:#b91c1c;       /* 危険 */
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+    }
+
+    /* ===== Base ===== */
+    html,body{ background:#f3f4f6; color:var(--ink); font-family:var(--sans); }
+    body{ margin:0; }
+
+    .page{
+      max-width: 980px;
+      margin: 24px auto;
+      background: var(--paper);
+      box-shadow: 0 10px 30px rgba(0,0,0,.06);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    header.cover{
+      padding: 28px 32px 18px 32px;
+      background: linear-gradient(135deg, rgba(30,58,138,.08), rgba(15,118,110,.06));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .title{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 16px;
+    }
+    .title h1{
+      margin:0;
+      font-size: 26px;
+      letter-spacing: .02em;
+    }
+    .title .meta{
+      text-align:right;
+      color:var(--muted);
+      font-size: 12px;
+      line-height:1.6;
+      white-space:nowrap;
+    }
+
+    .badge{
+      display:inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(30,58,138,.25);
+      background: rgba(30,58,138,.06);
+      color: var(--accent);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    main{ padding: 22px 32px 34px 32px; }
+
+    /* ===== Headings ===== */
+    h2{
+      margin: 26px 0 12px;
+      font-size: 18px;
+      padding: 10px 12px;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--accent);
+      border-radius: 10px;
+    }
+    h3{
+      margin: 18px 0 10px;
+      font-size: 15px;
+      padding-left: 10px;
+      border-left: 4px solid rgba(30,58,138,.35);
+    }
+    p{ margin: 8px 0; line-height: 1.75; }
+    .muted{ color:var(--muted); font-size: 12.5px; }
+
+    /* ===== TOC ===== */
+    .toc{
+      margin: 14px 0 18px;
+      padding: 14px 16px;
+      border: 1px dashed rgba(30,58,138,.35);
+      border-radius: 12px;
+      background: rgba(30,58,138,.03);
+    }
+    .toc h2{ margin:0 0 10px; padding:0; background:none; border:none; border-left:none; }
+    .toc ol{ margin:0; padding-left: 18px; }
+    .toc li{ margin: 6px 0; color: var(--ink); }
+    .toc a{ color: var(--accent); text-decoration: none; }
+    .toc a:hover{ text-decoration: underline; }
+
+    /* ===== Tables ===== */
+    table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 10px 0 16px;
+      font-size: 13.5px;
+    }
+    thead th{
+      background: rgba(31,41,55,.03);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 10px;
+      text-align:left;
+      color: #111827;
+    }
+    tbody td{
+      padding: 10px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    tbody tr:nth-child(even){ background: #fcfcfd; }
+    tbody tr:last-child td{ border-bottom:none; }
+    code, pre{
+      font-family: var(--mono);
+      font-size: 12.5px;
+    }
+    pre{
+      background: #0b1020;
+      color: #e5e7eb;
+      padding: 12px 14px;
+      border-radius: 12px;
+      overflow:auto;
+      margin: 10px 0 16px;
+    }
+
+    /* ===== Callouts ===== */
+    .callout{
+      border: 1px solid var(--line);
+      border-left: 6px solid rgba(30,58,138,.65);
+      background: #fbfdff;
+      padding: 12px 14px;
+      border-radius: 12px;
+      margin: 10px 0 16px;
+    }
+    .callout .label{
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--accent);
+      letter-spacing: .06em;
+    }
+    .callout.warn{ border-left-color: rgba(180,83,9,.75); background: #fffbeb; }
+    .callout.warn .label{ color: var(--warn); }
+    .callout.danger{ border-left-color: rgba(185,28,28,.75); background: #fef2f2; }
+    .callout.danger .label{ color: var(--danger); }
+
+    /* ===== Section blocks ===== */
+    .block{
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 14px 16px;
+      background: #fff;
+      margin: 10px 0 16px;
+    }
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 840px){
+      .grid2{ grid-template-columns: 1fr; }
+      .title{ flex-direction: column; }
+      .title .meta{ text-align:left; white-space:normal; }
+    }
+
+    /* ===== Footer ===== */
+    footer{
+      border-top: 1px solid var(--line);
+      padding: 14px 32px;
+      color: var(--muted);
+      font-size: 12px;
+      background: #fafafa;
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+
+    /* ===== Print ===== */
+    @media print{
+      body{ background: #fff; }
+      .page{ box-shadow:none; border:none; border-radius:0; margin:0; max-width:none; }
+      header.cover{ background: #fff; }
+      a{ color: inherit; text-decoration:none; }
+      h2{ page-break-after: avoid; }
+      table, .callout, .block{ page-break-inside: avoid; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <!-- ===== Cover ===== -->
+    <header class="cover">
+      <div class="title">
+        <div>
+          <h1>ソフトウェア仕様書</h1>
+          <div class="badge">仕様 / Design Spec</div>
+        </div>
+        <div class="meta">
+          文書ID：SPEC-XXX<br/>
+          バージョン：1.0.0<br/>
+          作成日：2026-01-11<br/>
+          作成者：OK
+        </div>
+      </div>
+      <p class="muted">※本書は印刷(A4)・Word/Excel貼り付けの両方を意識したレイアウトです。</p>
+    </header>
+
+    <main>
+      <!-- ===== Summary block ===== -->
+      <div class="block grid2">
+        <div>
+          <h3 style="margin-top:0;">対象システム</h3>
+          <p>（例）暗号化CSVインポート/エクスポート機能</p>
+          <p class="muted">適用範囲：クライアントアプリ / .NET Framework 4.7</p>
+        </div>
+        <div>
+          <h3 style="margin-top:0;">改定履歴</h3>
+          <table>
+            <thead>
+              <tr><th style="width:110px;">日付</th><th style="width:90px;">版</th><th>内容</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>2026-01-11</td><td>1.0.0</td><td>初版</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== TOC ===== -->
+      <section class="toc">
+        <h2>目次</h2>
+        <ol>
+          <li><a href="#sec1">概要</a></li>
+          <li><a href="#sec2">用語・前提</a></li>
+          <li><a href="#sec3">機能一覧</a></li>
+          <li><a href="#sec4">画面/入出力仕様</a></li>
+          <li><a href="#sec5">処理フロー</a></li>
+          <li><a href="#sec6">エラーハンドリング</a></li>
+          <li><a href="#sec7">非機能要件</a></li>
+          <li><a href="#sec8">付録</a></li>
+        </ol>
+      </section>
+
+      <!-- ===== Sections ===== -->
+      <section id="sec1">
+        <h2>1. 概要</h2>
+        <p>本書は、（機能名/システム名）に関する仕様を定義する。</p>
+
+        <div class="callout">
+          <div class="label">NOTE</div>
+          <p>「少しだけデザイン」を狙い、見出し帯・表の統一・注記ボックスのみで構成しています。</p>
+        </div>
+      </section>
+
+      <section id="sec2">
+        <h2>2. 用語・前提</h2>
+        <table>
+          <thead>
+            <tr><th style="width:180px;">用語</th><th>説明</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>CSV</td><td>Comma-Separated Values</td></tr>
+            <tr><td>暗号化</td><td>（例）AESによるデータ保護</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout warn">
+          <div class="label">WARN</div>
+          <p>文字コードや改行コードは運用で事故が起きやすいので、ここで明記する。</p>
+        </div>
+      </section>
+
+      <section id="sec3">
+        <h2>3. 機能一覧</h2>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:110px;">ID</th>
+              <th style="width:220px;">機能名</th>
+              <th>概要</th>
+              <th style="width:140px;">優先度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>F-001</td>
+              <td>CSVインポート</td>
+              <td>平文/暗号化CSVを読み込み、データを取り込む</td>
+              <td>Must</td>
+            </tr>
+            <tr>
+              <td>F-002</td>
+              <td>CSVエクスポート</td>
+              <td>設定に応じて平文/暗号化で出力</td>
+              <td>Must</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="sec4">
+        <h2>4. 画面/入出力仕様</h2>
+        <h3>4.1 画面項目</h3>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:220px;">項目</th>
+              <th style="width:120px;">種別</th>
+              <th style="width:120px;">必須</th>
+              <th>説明</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>暗号化を有効にする</td><td>CheckBox</td><td>任意</td><td>ON時は暗号化CSVを出力する</td></tr>
+            <tr><td>パスワード</td><td>Password</td><td>条件付</td><td>英数記号のみ（日本語不可）</td></tr>
+          </tbody>
+        </table>
+
+        <h3>4.2 入出力ファイル</h3>
+        <table>
+          <thead>
+            <tr><th style="width:220px;">ファイル</th><th style="width:120px;">形式</th><th>備考</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>入力CSV</td><td>UTF-8</td><td>平文/暗号化の自動判別（ヘッダmagic等）</td></tr>
+            <tr><td>出力CSV</td><td>UTF-8</td><td>設定により暗号化ON/OFF</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="sec5">
+        <h2>5. 処理フロー</h2>
+        <pre>
+(例) インポート処理
+1) ファイル読み込み
+2) ヘッダ判定（平文/暗号化）
+3) 必要なら復号
+4) CSVパース
+5) バリデーション
+6) 取り込み
+        </pre>
+      </section>
+
+      <section id="sec6">
+        <h2>6. エラーハンドリング</h2>
+        <div class="callout danger">
+          <div class="label">DANGER</div>
+          <p>復号失敗・パスワード不一致は「原因を出しすぎない」文言に寄せる（攻撃者支援を避ける）。</p>
+        </div>
+
+        <table>
+          <thead>
+            <tr><th style="width:140px;">コード</th><th style="width:240px;">事象</th><th>ユーザー表示</th><th>ログ</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>E-1001</td><td>復号失敗</td><td>ファイルを読み込めませんでした</td><td>例外詳細＋入力条件</td></tr>
+            <tr><td>E-1002</td><td>形式不正</td><td>CSV形式が不正です</td><td>行番号・列番号</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="sec7">
+        <h2>7. 非機能要件</h2>
+        <table>
+          <thead>
+            <tr><th style="width:220px;">項目</th><th>要件</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>性能</td><td>10万行のCSVをxx秒以内で処理</td></tr>
+            <tr><td>保守性</td><td>設定値を1箇所に集約（Configクラス等）</td></tr>
+            <tr><td>互換性</td><td>既存平文CSVは引き続きインポート可能</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="sec8">
+        <h2>8. 付録</h2>
+        <p class="muted">ここにサンプルCSV、パラメータ定義、用語集、参考資料などを置く。</p>
+      </section>
+    </main>
+
+    <footer>
+      <div>© 2026 / Spec Template</div>
+      <div class="muted">印刷時：背景色はプリンタ設定で薄くなる場合があります</div>
+    </footer>
+  </div>
+</body>
+</html>
